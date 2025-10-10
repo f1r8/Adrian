@@ -1,0 +1,1 @@
+As we are no longer able to quickly mass-email your codes, we plan to use this to upload your attempts for lab exercises and potentially PE.  We are not sure if this will work, but we will try.
