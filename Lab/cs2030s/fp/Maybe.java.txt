@@ -1,0 +1,113 @@
+package cs2030s.fp;
+
+public class Maybe<T> {
+  private T val;
+  private boolean hasVal;
+
+  private static final Maybe<?> NONE = new Maybe<>(null, false);
+
+  private Maybe(T val, boolean hasVal) {
+    this.val = val;
+    this.hasVal = hasVal;
+  }
+
+  public static <T> Maybe<T> some(T val) {
+    return new Maybe<T>(val, true);
+  }
+
+  public static <T> Maybe<T> none() {
+    @SuppressWarnings("unchecked")
+    Maybe<T> res = (Maybe<T>) NONE;
+    return res;
+  }
+
+  public static <T> Maybe<T> of(T val) {
+    if (val == null) {
+      return Maybe.none();
+    } else {
+      return Maybe.some(val);
+    }
+  }
+
+  protected T get() {
+    return this.val;
+  }
+
+  public Maybe<T> filter(BooleanCondition<? super T> pred) {
+    if (this.hasVal && (this.get() == null || pred.test(this.get()))) {
+      return this;
+    }
+    return Maybe.none();
+  }
+
+  public <U> Maybe<U> map(Transformer<? super T, ? extends U> func) {
+    if (!this.hasVal) {
+      return Maybe.none();
+    }
+    return Maybe.some(func.transform(this.get()));
+  }
+
+  public <U> Maybe<U> flatMap(Transformer<? super T, ? extends Maybe<? extends U>> func) {
+    if (!this.hasVal) {
+      return Maybe.none();
+    }
+    @SuppressWarnings("unchecked")
+    Maybe<U> tmp = (Maybe<U>) func.transform(this.get());
+    return tmp;
+  }
+
+  public <U extends T> T orElse(U u) {
+    if (this.hasVal) {
+      return this.get();
+    } else {
+      return u;
+    }
+  }
+
+  public T orElseGet(Producer<? extends T> prod) {
+    if (this.hasVal) {
+      return this.get();
+    } else {
+      return prod.produce();
+    }
+  }
+
+  public void ifPresent(Consumer<? super T> cons) {
+    if (this.hasVal) {
+      cons.consume(this.get());
+    }
+  }
+
+  @Override
+  public String toString() {
+    if (this.hasVal) {
+      return "[" + this.get() + "]";
+    } else {
+      return "[]";
+    }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj instanceof Maybe<?>) {
+      Maybe<?> maybe = (Maybe<?>) obj;
+      if (!this.hasVal && !maybe.hasVal) {
+        return true;
+      }
+      if (!this.hasVal || !maybe.hasVal) {
+        return false;
+      }
+      if (this.val == maybe.val) {
+        return true;
+      }
+      if (this.val == null || maybe.val == null) {
+        return false;
+      }
+      return this.val.equals(maybe.val);
+    }
+    return false;
+  }
+}

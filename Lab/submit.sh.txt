@@ -1,0 +1,81 @@
+#!/bin/sh
+
+# Check number of arguments
+set -o nounset
+if [[ $# -ne 1 ]]; then
+  echo "Usage: bash submit.sh task#"
+  echo "# is the task number (e.g., bash submit.sh task1)"
+  exit
+fi
+readonly TASK=$1
+readonly TASKS="task1 task2"
+
+submit() {
+  mkdir $TASK
+  cp *.java $TASK/
+  rm -f $TASK/.*.swp
+  echo
+  echo "'$TASK' submitted with the following file"
+  echo
+  ls -1 $TASK
+  echo
+}
+
+resubmit() {
+  if [[ -d "$TASK" ]]; then
+    echo
+    echo "❗️ You already has submission for '$TASK'."
+    echo "❗️ This will delete previous submission for '$TASK'."
+    read -p "❗️ Are you sure (y/n)? " -n 1 -r
+    echo # move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      rm -rf $TASK
+      submit $TASK
+    else
+      echo
+      echo "Submission cancelled."
+      echo
+    fi
+  else
+    submit
+  fi
+}
+
+check() {
+  echo
+  echo "❗️ Your code cannot be compiled."
+  echo "❗️ Please fix the compilation error before submitting."
+  read -p "❗️ Do you want to continue your submission (y/n)? " -n 1 -r
+  echo # move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    resubmit
+  else
+    echo
+    echo "Submission cancelled."
+    echo
+  fi
+}
+
+prep() {
+  echo " > Removing all class files.."
+  rm -f *.class
+  echo " > Re-adding class files.."
+  cp pristine/CS2030STest*.class .
+  cp pristine/Test*.class .
+  cp pristine/Secret.class .
+  echo " > Compiling all java files.."
+  javac *.java
+}
+
+# Check tasks
+if [[ " $TASKS " =~ " $TASK " ]]; then
+  echo "Submitting '$TASK'.."
+  prep
+  if [[ "$?" -ne 0 ]]; then
+    check $TASK
+  else
+    resubmit
+  fi
+else
+  echo "❗️ Unknown task: $TASK"
+fi

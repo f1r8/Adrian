@@ -1,0 +1,4 @@
+package cs2030s.fp;
+
+public interface Consumer<T> {
+  void consume(T arg);

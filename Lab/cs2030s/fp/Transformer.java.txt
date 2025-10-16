@@ -1,0 +1,4 @@
+package cs2030s.fp;
+
+public interface Transformer<T, R> {
+  R transform(T arg);

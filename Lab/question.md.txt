@@ -1,0 +1,340 @@
+plab0617@xcnd18:~$ cat question.md
+# Bank
+
+## Preliminary
+
+Make sure that the following files are in your home directory.
+
+- `checkstyle.jar`: style checker.
+- `checkstyle.sh`: style checker script.
+- `checkstyle.xml`: style checker styles.
+- `CS2030STest.class`: for testing, do not modify.
+- `question.md`: all the questions.
+- `Pair.java` and `Account.java`: provided, do not modify.
+- `Bank.java`: provided, modify to satisfy task requirement.
+- `submit.sh`: submission script.
+- `Test1.class` and `Test2.class`: for sanity check.
+
+Make sure you have the following directory.
+
+- `pristine`
+- `cs2030s/fp`: do not modify.
+
+**Note:** There is no more part 2.  Java files marked as "do not modify" will
+be replaced with the original version during testing.
+
+
+## Important Note
+
+### Functional Style
+
+If functional style is required, your code must conform to the functional
+style.  As a sanity check, your answer should only be a single statement.
+There should not be anything else (e.g., block, other classes not mentioned,
+other methods not mentioned, etc).  Any attempt at circumventing this
+restriction will invalidate the submission.
+
+Most of the time, this will be a `return` statement if you need to return some
+value.  However, in some cases, you are to write a `void` method in which
+case, there should not be a `return`.
+
+You may use lambda expressions with a single expression (if necessary).  You
+should not create new methods (not even constructors) or use blocks in your
+lambda expressions.  A typical misconception is to think that as long as there
+is only one `return` statement, the code is functional-style. This is not
+correct if the code has other statements (e.g., assignments before the
+`return`).
+
+**Conditional expressions are banned.**
+
+
+### Sample Run
+
+You need to get yourself familiar with sample run.  The sample run will
+contain the expected format.  In some cases, we will not give the detailed
+format and you will need to deduce the format from the sample output.
+
+
+### No Import
+
+You are now **NOT** allowed to use add your own `import` statement.  If you
+are creating new files, these files cannot have `import`.
+
+
+### Style
+
+You are now required to follow CS2030S style guide closely.  We provide the
+style checker and you are required to have no warning on all files you
+submitted even if the class in the file is not used.  Check your code style
+with the following command.
+
+```shell
+bash checkstyle.sh
+```
+
+
+### Compilation
+
+Any code you created or edited that cannot be compiled will result in 0
+marks for the given task.  Make sure your submission compiles by
+running the following command before submission.  Also make sure that your
+code does not produce warning when compiled with the following command.
+
+```shell
+javac -Xlint:unchecked -Xlint:rawtype cs2030s/fp/*.java
+javac -Xlint:unchecked -Xlint:rawtype *.java
+```
+
+
+
+## Description
+
+Welcome to the second half of the semester where we will be learning
+functional programming.  Our first exercise is to try to abstract away the
+selection statement using `Maybe<T>` class.  We will also be using Java `Map`.
+
+
+### Maybe<T>
+
+Recap our `Maybe<T>` class.
+- Factory Methods
+  - `public static <T> Maybe<T> of(T val)`
+  - `public static <T> Maybe<T> some(T val)`
+  - `public static <T> Maybe<T> none()`
+- Operations
+  - `public Maybe<T> filter(BooleanCondition<? super T> pred)`
+  - `public <U> Maybe<U> map(Transformer<? super T, ? extends U> func)`
+  - `public <U> Maybe<U> flatMap(Transformer<? super T,
+                                 ? extends Maybe<? extends U>> func)`
+- Retrieval
+  - `public <U extends T> T orElse(U u)`
+  - `public T orElseGet(Producer<? extends T> prod)`
+  - `public void ifPresent(Consumer<? super T> cons)`
+
+**Note:** `Maybe::get()` method is `protected` and cannot be used.  You are
+**NOT** allowed to modify this to `public`.
+
+
+### Map<K,V>
+
+- `public V get(Object key)`: Returns the value to which the specified `key`
+  is mapped, or `null` if this `map` contains no mapping for the `key`.
+- `public V put(K key, V value)`: Associates the specified `value` with the
+  specified `key` in this `map` (optional operation).
+
+
+
+## Maybe<T> I can Earn Money
+
+You are given three classes: `Pair`, `Account`, and `Bank`.  You should read
+the given source codes to understand the behavior of each class and their
+interaction with each other.
+
+Your task is to convert `Bank.java` into functional style in the part where
+they are required.  You are **only** allowed to modify `Bank`.
+
+
+### Task 1
+
+- Convert the `Bank::deposit` method to functional-style.
+- Convert the `Bank::withdraw` method to functional-style.
+
+You can test with `Test1.class`.  But note that the original code already pass
+all the tests.  Your code should still pass all the tests.
+
+```java
+jshell> Account[] accs = new Account[] {
+   ...>         new Account(1, 100.0),
+   ...>         new Account(2, 150.0),
+   ...>         new Account(3, 90.0),
+   ...>         new Account(4, 70.0, true)
+   ...> }
+jshell> Map<Integer, Account> map = new HashMap<>()
+jshell> for (Account acc : accs) {
+   ...>         map.put(acc.getAccountNumber(),
+   ...>             new Account(acc.getAccountNumber(), acc.getBalance(),
+   ...>             acc.isClosed()));
+   ...> }
+jshell> Bank bank = new Bank(map)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 100.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: 90.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+
+jshell> bank.withdraw(3, 20.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 100.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: 70.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.withdraw(4, 10.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 100.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: 70.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.withdraw(3, 90.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 100.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: -20.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.withdraw(9, 90.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 100.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: -20.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+
+jshell> bank.deposit(1, 100.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 200.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: -20.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.deposit(4, 999.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 200.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: -20.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.deposit(3, 20.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 200.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: 0.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.deposit(9, 1000.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 200.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: 0.00
+Acc ID: 4, balance: 70.00 [Closed]
+```
+
+**Important:** Do not forget to submit your task 1.
+
+```shell
+bash submit.sh task1
+```
+
+
+### Task 2
+
+- Convert the `Bank::transfer` method to partially functional-style.
+  You may not be able to fully make it functional-style as you may need
+  `fromAccount` and `toAccount`.  Your implementation should look like the
+  following.
+
+  ```java
+  Maybe<Account> fromAccount = ...;
+  Maybe<Account> toAccount = ...;
+
+  // Functional-style below
+  ```
+
+  Make sure that you only keep the two assignments above.  All other code
+  should be in functional-style.
+
+You can test with `Test2.class`.  But note that the original code already pass
+all the tests.  Your code should still pass all the tests.
+
+```java
+jshell> Account[] accs = new Account[] {
+   ...>         new Account(1, 100.0),
+   ...>         new Account(2, 150.0),
+   ...>         new Account(3, 90.0),
+   ...>         new Account(4, 70.0, true)
+   ...> }
+jshell> Map<Integer, Account> map = new HashMap<>()
+jshell> for (Account acc : accs) {
+   ...>         map.put(acc.getAccountNumber(),
+   ...>             new Account(acc.getAccountNumber(), acc.getBalance(),
+   ...>             acc.isClosed()));
+   ...> }
+jshell> Bank bank = new Bank(map)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 100.00
+Acc ID: 2, balance: 150.00
+Acc ID: 3, balance: 90.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+
+jshell> bank.transfer(1, 2, 30.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 70.00
+Acc ID: 2, balance: 180.00
+Acc ID: 3, balance: 90.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.transfer(2, 1, 40.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 110.00
+Acc ID: 2, balance: 140.00
+Acc ID: 3, balance: 90.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+
+jshell> bank.transfer(1, 4, 50.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 110.00
+Acc ID: 2, balance: 140.00
+Acc ID: 3, balance: 90.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.transfer(4, 1, 20.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 110.00
+Acc ID: 2, balance: 140.00
+Acc ID: 3, balance: 90.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.transfer(9, 10, 10.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 110.00
+Acc ID: 2, balance: 140.00
+Acc ID: 3, balance: 90.00
+Acc ID: 4, balance: 70.00 [Closed]
+
+jshell> bank.transfer(3, 2, 150.0)
+jshell> bank
+bank ==> Bank Status:
+Acc ID: 1, balance: 110.00
+Acc ID: 2, balance: 140.00
+Acc ID: 3, balance: 90.00
+Acc ID: 4, balance: 70.00 [Closed]
+```
+
+**Important:** Do not forget to submit your task 2.
+
+```shell
+bash submit.sh task2
+```
+
+
+Good Luck!
+plab0617@xcnd18:~$

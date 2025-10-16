@@ -1,0 +1,4 @@
+package cs2030s.fp;
+
+public interface Producer<T> {
+  T produce();
