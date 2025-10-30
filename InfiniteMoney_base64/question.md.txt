@@ -1,0 +1,289 @@
+# Infinite Money
+
+## Preliminary
+
+Make sure that the following files are in your home directory.
+
+- `checkstyle.jar`: style checker.
+- `checkstyle.sh`: style checker script.
+- `checkstyle.xml`: style checker styles.
+- `CS2030STest.class`: for testing, do not modify.
+- `question.md`: all the questions.
+- `Account.java`: provided, do not modify.
+- `Bank.java`: provided, modify to satisfy task requirement.
+- `submit.sh`: submission script.
+- `Test1.class` and `Test2.class`: for sanity check.
+
+Make sure you have the following directory.
+
+- `pristine`
+- `cs2030s/fp`: do not modify.
+
+**Note:** There is no more part 2.  Java files marked as "do not modify" will
+be replaced with the original version during testing.
+
+
+## Important Note
+
+### Functional Style
+
+If functional style is required, your code must conform to the functional
+style.  As a sanity check, your answer should only be a single statement.
+There should not be anything else (e.g., block, other classes not mentioned,
+other methods not mentioned, etc).  Any attempt at circumventing this
+restriction will invalidate the submission.
+
+Most of the time, this will be a `return` statement if you need to return some
+value.  However, in some cases, you are to write a `void` method in which
+case, there should not be a `return`.
+
+You may use lambda expressions with a single expression (if necessary).  You
+should not create new methods (not even constructors) or use blocks in your
+lambda expressions.  A typical misconception is to think that as long as there
+is only one `return` statement, the code is functional-style. This is not
+correct if the code has other statements (e.g., assignments before the
+`return`).
+
+You are not allowed to modify the method descriptor of any given method.  You
+are not allowed to use array.
+
+**Conditional expressions are banned.**
+
+
+### Sample Run
+
+You need to get yourself familiar with sample run.  The sample run will
+contain the expected format.  In some cases, we will not give the detailed
+format and you will need to deduce the format from the sample output.
+
+
+### No Import
+
+You are now **NOT** allowed to use add your own `import` statement.  If you
+are creating new files, these files cannot have `import`.
+
+
+### Style
+
+You are now required to follow CS2030S style guide closely.  We provide the
+style checker and you are required to have no warning on all files you
+submitted even if the class in the file is not used.  Check your code style
+with the following command.
+
+```shell
+bash checkstyle.sh
+```
+
+
+### Compilation
+
+Any code you created or edited that cannot be compiled will result in 0
+marks for the given task.  Make sure your submission compiles by
+running the following command before submission.  Also make sure that your
+code does not produce warning when compiled with the following command.
+
+```shell
+javac -Xlint:unchecked -Xlint:rawtype cs2030s/fp/*.java
+javac -Xlint:unchecked -Xlint:rawtype *.java
+```
+
+
+
+## Description
+
+Welcome to the second half of the semester where we will be learning
+functional programming.  Our first exercise is to try to abstract away the
+selection statement using `Maybe<T>` class.  We will also be using Java `Map`.
+
+
+### Maybe<T>
+
+Recap our `Maybe<T>` class.
+- Factory Methods
+  - `public static <T> Maybe<T> of(T val)`
+  - `public static <T> Maybe<T> some(T val)`
+  - `public static <T> Maybe<T> none()`
+- Operations
+  - `public Maybe<T> filter(BooleanCondition<? super T> pred)`
+  - `public <U> Maybe<U> map(Transformer<? super T, ? extends U> func)`
+  - `public <U> Maybe<U> flatMap(Transformer<? super T,
+                                 ? extends Maybe<? extends U>> func)`
+- Retrieval
+  - `public <U extends T> T orElse(U u)`
+  - `public T orElseGet(Producer<? extends T> prod)`
+  - `public void ifPresent(Consumer<? super T> cons)`
+
+**Note:** `Maybe::get()` method is `protected` and cannot be used.  You are
+**NOT** allowed to modify this to `public`.
+
+
+### InfiniteList<T>
+
+Recap our `InfiniteList<T>` class.
+- Factory Methods
+  - `public static <T> InfiniteList<T> generate(Producer<T> prod)`
+    [prod(), prod(), prod(), ...]
+  - `public static <T> InfiniteList<T> iterate(T seed, Transformer<? super T, ? extends T> next)`
+    [seed, next(seed), next(next(seed)), ...]
+  - `public static <T> InfiniteList<T> sentinel()`
+- Operations
+  - `public InfiniteList<T> filter(BooleanCondition<? super T> pred)`
+  - `public <U> InfiniteList<U> map(Transformer<? super T, ? extends U> func)`
+  - `public <U> InfiniteList<U> flatMap(Transformer<? super T, ? extends InfiniteList<? extends U>> func)`
+  - `public InfiniteList<T> append(InfiniteList<T> list)`
+- Finite Operations
+  - `public InfiniteList<T> limit(int n)`
+  - `public InfiniteList<T> takeWhile(BooleanCondition<? super T> cond)`
+- Retrieval
+  - `public T head()`
+  - `public InfiniteList<T> tail()`
+- Terminal
+  - `public List<T> toList()`
+    **Important:** You are not allowed to use `toList()`
+  - `public T reduce(T id, Combiner<? super T, ? super T, ? extends T> comb)`
+  - `public long count()`
+- Predicates
+  - `public boolean isSentinel()`
+
+
+
+## Functional Shopping Cart
+
+You are given two classes: `Account` and `Bank`.  You should read the given
+source codes to understand the behavior of each class and their interaction
+with each other.
+
+
+### Account
+
+`Account` is a class that represents an account in a bank. Each account has
+the following fields.
+
+- An `int` account number called `accountNumber`, with accessor
+  `getAccountNumber()`.
+- A `String` owner called `owner`, with accessor `getOwner()`.
+- A `double` balance called `balance`, with accessor `getBalance()`, and two
+  mutators: `deposit(double amount)` and `withdraw(double amount)`.
+
+**Important:** We guarantee that `accountNumber` is unique in a single bank.
+
+
+
+### Bank
+
+Our `Bank` is getting more popular and now we need to add more functionalities
+to it. The board members wants you to implement the following methods.
+
+- `double totalMoneyInBank()` that calculates the total money in the bank
+  across all accounts.
+- `double totalMoneyByOwner(String owner)` that calculates the total money in
+  the bank across all accounts owned by the given owner.
+- `Bank multiAccounts()` that returns a bank containing `Accounts` that belong
+  to someone having multiple bank accounts.  An owner has multiple accounts if
+  there are two accounts with equal owner field.
+
+**Note:** The details of all active accounts is simply a string concatenation
+of all accounts that ends with a newline character `"\n"`.  As a loop, if can
+be written as the following.
+
+```java
+String res = "";
+for (Account acc : this.accounts.toList()) {
+  res += account.toString() + "\n";
+}
+return res;
+```
+
+
+
+## Tasks
+
+Your task is to implement some methods in `Bank.java` into functional style in
+the part where they are required.  You are **only** allowed to modify `Bank`.
+
+**Important:** You are not allowed to modify other methods.
+
+
+### Task 1
+
+- Implement the `Bank::totalMoneyInBank` method using functional-style.
+- Implement the `Bank::totalMoneyByOwner` method using functional-style.
+
+You can test with `Test1.class`.
+
+```java
+jshell> // Assume the following InfiniteList of accounts in bank1
+   ...> //        new Account(1, "Alice", 100.0)
+   ...> //        new Account(2, "Bob", 150.0)
+   ...> //        new Account(3, "Charlie", 90.0)
+   ...> //        new Account(4, "Alice", 70.0)
+
+jshell> bank1.totalMoneyInBank()
+$.. ==> 410.0
+
+jshell> bank1.totalMoneyByOwner("Alice")
+$.. ==> 170.0
+jshell> bank1.totalMoneyByOwner("Bob")
+$.. ==> 150.0
+jshell> bank1.totalMoneyByOwner("Adi")
+$.. ==> 0.0
+
+
+jshell> // Assume the following InfiniteList of accounts in bank2
+   ...> //        new Account(1, "Alice", 100.0)
+   ...> //        new Account(3, "Charlie", 90.0)
+   ...> //        new Account(4, "Alice", 70.0)
+
+jshell> bank2.totalMoneyInBank()
+$.. ==> 260.0
+
+jshell> bank2.totalMoneyByOwner("Alice")
+$.. ==> 170.0
+jshell> bank2.totalMoneyByOwner("Bob")
+$.. ==> 0.0
+jshell> bank2.totalMoneyByOwner("Adi")
+$.. ==> 0.0
+```
+
+**Important:** Do not forget to submit your task 1.
+
+```shell
+bash submit.sh task1
+```
+
+
+### Task 2
+
+- Implement the `Bank::multiAccounts` method using functional-style.
+
+You can test with `Test2.class`.
+
+```java
+jshell> // Assume the following InfiniteList of accounts in bank1
+   ...> //        new Account(1, "Alice", 100.0)
+   ...> //        new Account(2, "Bob", 150.0)
+   ...> //        new Account(3, "Charlie", 90.0)
+   ...> //        new Account(4, "Alice", 70.0)
+
+jshell> System.out.println(bank1.multiAccounts())
+Acc: 1, balance: 100.00
+Acc: 4, balance: 70.00
+
+
+jshell> // Assume the following InfiniteList of accounts in bank2
+   ...> //        new Account(1, "Alice", 100.0)
+   ...> //        new Account(2, "Bob", 150.0)
+   ...> //        new Account(3, "Charlie", 90.0)
+
+jshell> System.out.println(bank2.multiAccounts())
+
+```
+
+**Important:** Do not forget to submit your task 2.
+
+```shell
+bash submit.sh task2
+```
+
+
+Good Luck!
