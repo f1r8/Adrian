@@ -14,5 +14,7 @@ micro base64.zip
 `Ctrl-v`
 
 Unlocking:
+
 base64 -d base64.zip > thing.zip
+
 unzip thing.zip
