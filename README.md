@@ -18,6 +18,8 @@ git clone https://github.com/f1r8/Adrian.git
 
 Unlocking:
 
+dos2unix base64.zip
+
 base64 -d base64.zip > thing.zip
 
 unzip thing.zip
