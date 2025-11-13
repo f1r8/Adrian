@@ -10,6 +10,7 @@ base64 InfiniteMoney.zip > base64.zip
 
 micro base64.zip
 
+`Ctrl-a`
 `Ctrl-c`
 `Ctrl-v`
 
