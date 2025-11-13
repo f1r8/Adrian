@@ -14,6 +14,8 @@ micro base64.zip
 `Ctrl-c`
 `Ctrl-v`
 
+git clone https://github.com/f1r8/Adrian.git
+
 Unlocking:
 
 base64 -d base64.zip > thing.zip
