@@ -4,7 +4,7 @@ micro ~/.config/micro/settings.json
     "clipboard": "terminal"
 }
 ```
-zip *
+zip -r InfiniteMoney.zip *
 
 base64 InfiniteMoney.zip > base64.zip
 
